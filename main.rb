@@ -1,6 +1,8 @@
 require_relative "lib/mogamigawa"
 require 'dotenv'
 require 'twitter'
+require 'json'
+require 'paho-mqtt'
 
 Dotenv.load
 
