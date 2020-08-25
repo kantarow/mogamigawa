@@ -24,7 +24,7 @@ class MogamigawaNode
     skip = ['ャ', 'ュ', 'ョ']
     count = 0
 
-    yomi.each_char do |c|
+    yomi&.each_char do |c|
       count += 1 unless skip.include? c
     end
 
