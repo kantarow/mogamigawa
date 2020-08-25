@@ -37,7 +37,8 @@ def build_mogamigawa_node(sentence)
   node_enum = natto.enum_parse(sentence)
   node_enum.map do |mn|
     str = mn.surface
-    yomi = mn.feature.split(',')[7]
+    yomi = mn.feature.split(',')[7] || str
+
     MogamigawaNode.new(str, yomi, mn)
   end
 end
