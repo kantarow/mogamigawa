@@ -1,13 +1,15 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    mecab (0.996)
+    ffi (1.13.1)
+    natto (1.2.0)
+      ffi (>= 1.9.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  mecab
+  natto
 
 BUNDLED WITH
    2.1.4
