@@ -1,10 +1,35 @@
 require 'natto'
 
+Kigo = {
+  "夏" => "summer",
+  "ひまわり" => "sunflower",
+  "スイカ" => "water_melon",
+  "かき氷" => "snow_cone",
+  "浮き輪" => "air_bladder",
+  "海" => "sea",
+  "プール" => "pool",
+  "セミ" => "cicada",
+  "祭り" => "festival",
+  "花火" => "firework",
+  "アイスクリーム" => "ice_cream",
+  "冬" => "winter",
+  "雪" => "snow",
+  "秋" => "fall",
+  "紅葉" => "crimson_foliage",
+  "春" => "spring",
+  "桜" => "cherry_tree",
+  "卒業" => "graduation",
+  "五月雨" => "samidare",
+}
+
 class MogamigawaNode
   attr_reader :mecab_node
+  attr_reader :kigo
+  attr_reader :str
 
   def initialize(str, yomi, mecab_node=nil)
     @str = str
+    @kigo = Kigo[str]
     @yomi = yomi
     @yomi_length = count_sounds @yomi
     @mecab_node = mecab_node
