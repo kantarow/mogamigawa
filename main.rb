@@ -22,14 +22,19 @@ twitter_client = Twitter::REST::Client.new do |config|
   config.access_token_secret = ENV['ACCESS_TOKEN_SECRET']
 end
 
+
 mqtt_client = AwsIotDevice::MqttShadowClient::MqttManager.new(host: MQTT_HOST, port: MQTT_PORT)
 mqtt_client.config_ssl_context(ROOT_CA_PATH, PRIVATE_KEY_PATH, CERTIFICATE_PATH)
 mqtt_client.connect
 
 TARGET_USERS = twitter_client.follower_ids
 
-TARGET_USERS.each do |user|
-  tweets = twitter_client.user_timeline(user)
+old_timeline = []
+
+loop do
+  current_timeline = twitter_client.home_timeline
+  tweets = current_timeline - old_timeline
+  old_timeline = current_timeline
 
   tweets.each do |tweet|
     text = tweet.full_text
@@ -59,9 +64,12 @@ TARGET_USERS.each do |user|
       kigo: kigo,
     }.to_json
 
+    p pub_json
+
     mqtt_client.publish(MQTT_TOPIC, pub_json)
-    sleep 5
+    sleep 8
   end
+  sleep 60
 end
 
 sleep 1
