@@ -3,12 +3,17 @@ require 'dotenv'
 require 'twitter'
 require 'json'
 require 'paho-mqtt'
-
-MQTT_HOST = "localhost"
-MQTT_PORT = 1883
-MQTT_TOPIC = "haiku"
+require 'aws_iot_device'
 
 Dotenv.load
+
+MQTT_HOST = ENV['MQTT_HOST']
+MQTT_PORT = ENV['MQTT_PORT']
+MQTT_TOPIC = "haiku"
+
+ROOT_CA_PATH = ENV['ROOT_CA_PATH']
+CERTIFICATE_PATH = ENV['CERTIFICATE_PATH']
+PRIVATE_KEY_PATH = ENV['PRIVATE_KEY_PATH']
 
 twitter_client = Twitter::REST::Client.new do |config|
   config.consumer_key        = ENV['API_KEY']
@@ -17,8 +22,9 @@ twitter_client = Twitter::REST::Client.new do |config|
   config.access_token_secret = ENV['ACCESS_TOKEN_SECRET']
 end
 
-mqtt_client = PahoMqtt::Client.new
-mqtt_client.connect(MQTT_HOST, MQTT_PORT)
+mqtt_client = AwsIotDevice::MqttShadowClient::MqttManager.new(host: MQTT_HOST, port: MQTT_PORT)
+mqtt_client.config_ssl_context(ROOT_CA_PATH, PRIVATE_KEY_PATH, CERTIFICATE_PATH)
+mqtt_client.connect
 
 TARGET_USERS = [
   "kantarow_",
@@ -40,7 +46,17 @@ TARGET_USERS.each do |user|
       next
     end
 
-    pub_json = { body: haiku }.to_json
-    mqtt_client.publish(MQTT_TOPIC, pub_json, false, 1)
+    pub_json = {
+      first: haiku[0],
+      second: haiku[1],
+      third: haiku[2],
+      kigo: "",
+    }.to_json
+
+    mqtt_client.publish(MQTT_TOPIC, pub_json)
   end
 end
+
+sleep 1
+
+mqtt_client.disconnect
